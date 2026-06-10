@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swipxl — Tinder for Your Camera Roll | Clean Photos in Minutes</title>
+<meta name="description" content="Swipxl is a privacy-first photo cleaner. Swipe left to delete, right to keep. 100% on-device scanning sorts duplicates, screenshots, blurry & old photos into decks. No ads, no account.">
+<meta name="theme-color" content="#161622">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Swipxl — Tinder for Your Camera Roll">
+<meta property="og:description" content="Swipe left to delete, swipe right to keep. Clean your camera roll in minutes. 100% on-device. No predatory subscriptions.">
+<meta property="og:image" content="assets/icon.png">
+<meta property="og:url" content="https://swipxl.app">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* App design tokens (from app_colors.dart) */
+    --bg:#161622;
+    --surface:#1C1C2A;
+    --card:#1E1E2C;
+    --card-2:#212133;
+    --text:#F8F9FA;
+    --muted:#9CA3AF;
+    --line:#2C2C3E;
+    --grad-start:#667EEA;
+    --grad-end:#764BA2;
+    --gradient:linear-gradient(135deg,#667EEA 0%,#764BA2 100%);
+    --delete:#FF8A8A;
+    --save:#8AFF8A;
+
+    /* Category accents */
+    --cat-duplicate:#98E8BA;
+    --cat-screenshot:#A0C4FF;
+    --cat-blurry:#FFD6A5;
+    --cat-similar:#D5AAFF;
+    --cat-dark:#B0B0C0;
+    --cat-meme:#FFB3B3;
+    --cat-old:#FFF0A8;
+
+    --radius-card:16px;
+    --radius-btn:12px;
+    --radius-lg:24px;
+    --maxw:1120px;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Nunito',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px;
+    line-height:1.6;
+    font-weight:500;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  h1,h2,h3{font-weight:800;line-height:1.15;margin:0}
+  p{margin:0}
+  section{position:relative}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  .gradient-text{
+    background:var(--gradient);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .eyebrow{
+    display:inline-block;font-weight:800;font-size:13px;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+  }
+
+  /* Ambient background glows */
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none;z-index:0}
+
+  /* ---------- Nav ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(22,22,34,.72);
+    backdrop-filter:saturate(160%) blur(14px);
+    -webkit-backdrop-filter:saturate(160%) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:21px;letter-spacing:.3px}
+  .brand img{width:34px;height:34px;border-radius:9px;box-shadow:0 4px 14px rgba(118,75,162,.4)}
+  .nav-links{display:flex;align-items:center;gap:30px}
+  .nav-links a{color:var(--muted);font-weight:700;font-size:15px;transition:color .15s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{
+    background:var(--gradient);color:#fff;padding:10px 20px;border-radius:var(--radius-btn);
+    font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(102,126,234,.35);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(102,126,234,.45)}
+  @media(max-width:820px){.nav-links a:not(.nav-cta){display:none}}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:84px 0 64px;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;position:relative;z-index:2}
+  .hero h1{font-size:clamp(38px,6vw,62px);font-weight:900;letter-spacing:-1px}
+  .hero .sub{color:var(--muted);font-size:clamp(17px,2.2vw,21px);margin-top:22px;max-width:540px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .pill{
+    display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--text);
+  }
+  .pill .dot{width:8px;height:8px;border-radius:50%}
+
+  /* Store badges */
+  .stores{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+  .store-badge{
+    display:inline-flex;align-items:center;gap:12px;
+    background:#000;border:1px solid #3a3a4a;border-radius:14px;
+    padding:11px 18px;min-width:194px;transition:transform .15s, border-color .15s;
+  }
+  .store-badge:hover{transform:translateY(-2px);border-color:#5a5a72}
+  .store-badge svg{flex-shrink:0}
+  .store-badge .st-txt{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+  .store-badge .st-small{font-size:11px;color:#cfcfe0;font-weight:600;letter-spacing:.3px}
+  .store-badge .st-big{font-size:19px;color:#fff;font-weight:800;letter-spacing:.2px}
+  .store-note{font-size:12.5px;color:var(--muted);margin-top:12px;font-weight:600}
+
+  /* Phone mockup */
+  .phone-stage{position:relative;display:flex;justify-content:center;align-items:center;min-height:560px}
+  .phone{
+    position:relative;width:266px;border-radius:38px;padding:11px;
+    background:linear-gradient(160deg,#2a2a3c,#15151f);
+    border:1px solid #34344a;
+    box-shadow:0 40px 90px -20px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.03) inset;
+    z-index:3;
+  }
+  .phone img{border-radius:30px;width:100%;display:block}
+  .phone .notch{
+    position:absolute;top:18px;left:50%;transform:translateX(-50%);
+    width:42px;height:6px;border-radius:6px;background:#000;opacity:.55;z-index:4;
+  }
+  .phone.back{
+    position:absolute;width:240px;transform:rotate(-9deg) translate(-94px,26px) scale(.9);
+    opacity:.92;z-index:1;filter:saturate(.95);
+  }
+  @media(max-width:880px){
+    .hero-grid{grid-template-columns:1fr;gap:30px}
+    .phone-stage{min-height:520px;margin-top:10px}
+    .phone.back{display:none}
+  }
+
+  /* ---------- Trust strip ---------- */
+  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+  .trust-inner{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;padding:22px 22px}
+  .trust-item{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:700;font-size:15px}
+  .trust-item svg{color:var(--save)}
+
+  /* ---------- Generic section ---------- */
+  .sec{padding:88px 0}
+  .sec-head{text-align:center;max-width:680px;margin:0 auto 52px}
+  .sec-head h2{font-size:clamp(28px,4vw,42px);letter-spacing:-.5px}
+  .sec-head p{color:var(--muted);margin-top:16px;font-size:18px}
+
+  /* Feature cards */
+  .features{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .feature{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-card);
+    padding:28px 24px;transition:transform .18s, border-color .18s;
+  }
+  .feature:hover{transform:translateY(-4px);border-color:#3a3a52}
+  .feature .ic{
+    width:52px;height:52px;border-radius:14px;display:grid;place-items:center;margin-bottom:18px;
+    background:rgba(102,126,234,.14);color:#A9B6F5;
+  }
+  .feature h3{font-size:19px;margin-bottom:8px}
+  .feature p{color:var(--muted);font-size:15.5px}
+  @media(max-width:980px){.features{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.features{grid-template-columns:1fr}}
+
+  /* How it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .step{
+    background:linear-gradient(180deg,var(--card),var(--bg));
+    border:1px solid var(--line);border-radius:var(--radius-card);padding:30px 26px;position:relative;
+  }
+  .step .num{
+    font-size:15px;font-weight:900;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:var(--gradient);color:#fff;margin-bottom:18px;box-shadow:0 6px 16px rgba(118,75,162,.4);
+  }
+  .step h3{font-size:20px;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:15.5px}
+  @media(max-width:820px){.steps{grid-template-columns:1fr}}
+
+  /* Categories */
+  .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .cat{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-card);
+    padding:22px 20px;transition:transform .15s, border-color .15s;
+  }
+  .cat:hover{transform:translateY(-3px)}
+  .cat .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .cat .chip{
+    width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  }
+  .cat .chip svg{width:24px;height:24px}
+  .cat h3{font-size:17px;margin-bottom:5px}
+  .cat p{color:var(--muted);font-size:14px}
+  .tag{
+    font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;
+  }
+  .tag.free{background:rgba(138,255,138,.14);color:var(--save)}
+  .tag.pro{background:rgba(118,75,162,.22);color:#C9A8F0;border:1px solid rgba(118,75,162,.4)}
+  @media(max-width:980px){.cats{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.cats{grid-template-columns:1fr}}
+
+  /* Showcase / screenshots */
+  .showcase{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .shots{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  .shot{
+    width:228px;border-radius:26px;padding:8px;background:linear-gradient(160deg,#2a2a3c,#15151f);
+    border:1px solid #32324a;box-shadow:0 26px 60px -22px rgba(0,0,0,.7);
+  }
+  .shot img{border-radius:20px}
+  .shot .cap{text-align:center;color:var(--muted);font-size:13.5px;font-weight:700;padding:12px 6px 4px}
+
+  /* Pricing */
+  .price-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:24px;align-items:stretch}
+  .plan{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:34px 30px;
+    display:flex;flex-direction:column;
+  }
+  .plan.pro{
+    background:
+      radial-gradient(120% 120% at 0% 0%, rgba(102,126,234,.16), transparent 55%),
+      var(--card);
+    border:1px solid rgba(118,75,162,.55);position:relative;
+    box-shadow:0 24px 60px -28px rgba(118,75,162,.6);
+  }
+  .plan-name{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .plan .lead{font-size:34px;font-weight:900;margin-top:8px}
+  .plan .lead small{font-size:16px;color:var(--muted);font-weight:700}
+  .plan ul{list-style:none;padding:0;margin:22px 0 26px;display:grid;gap:12px}
+  .plan li{display:flex;align-items:flex-start;gap:10px;color:var(--text);font-size:15.5px;font-weight:600}
+  .plan li svg{flex-shrink:0;margin-top:3px;color:var(--save)}
+  .plan li.off{color:var(--muted)}
+  .plan li.off svg{color:#55556a}
+  .badge-best{
+    position:absolute;top:18px;right:20px;background:var(--gradient);color:#fff;
+    font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;letter-spacing:.4px;
+  }
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 22px}
+  .tier{
+    background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px 14px;text-align:center;
+  }
+  .tier .t-name{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .tier .t-price{font-size:24px;font-weight:900;margin-top:6px}
+  .tier .t-sub{font-size:12px;color:var(--muted);margin-top:2px;font-weight:600}
+  .tier.highlight{border-color:rgba(118,75,162,.6);background:rgba(118,75,162,.1)}
+  .price-note{color:var(--muted);font-size:13px;margin-top:4px;font-weight:600}
+  @media(max-width:820px){.price-grid{grid-template-columns:1fr}.tiers{grid-template-columns:1fr}}
+
+  .btn-grad{
+    background:var(--gradient);color:#fff;font-weight:800;font-size:16px;
+    padding:14px 22px;border-radius:var(--radius-btn);text-align:center;
+    box-shadow:0 10px 24px rgba(102,126,234,.4);transition:transform .15s, box-shadow .15s;border:none;cursor:pointer;
+  }
+  .btn-grad:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(102,126,234,.5)}
+  .btn-ghost{
+    background:transparent;color:var(--text);font-weight:800;font-size:16px;
+    padding:14px 22px;border-radius:var(--radius-btn);text-align:center;border:1px solid var(--line);
+  }
+
+  /* Privacy band */
+  .privacy-band{
+    background:
+      radial-gradient(100% 140% at 50% 0%, rgba(118,75,162,.18), transparent 60%),
+      var(--bg);
+  }
+  .privacy-card{
+    border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--card);
+    padding:48px 40px;text-align:center;max-width:840px;margin:0 auto;position:relative;overflow:hidden;
+  }
+  .shield{
+    width:72px;height:72px;border-radius:20px;display:grid;place-items:center;margin:0 auto 22px;
+    background:rgba(138,255,138,.12);color:var(--save);
+  }
+
+  /* Final CTA */
+  .final{
+    text-align:center;
+    background:
+      radial-gradient(90% 120% at 50% 0%, rgba(102,126,234,.22), transparent 60%),
+      var(--surface);
+    border-top:1px solid var(--line);
+  }
+  .final h2{font-size:clamp(30px,4.5vw,46px);letter-spacing:-.5px}
+  .final .stores{justify-content:center}
+
+  /* Footer */
+  footer.site{border-top:1px solid var(--line);background:var(--bg);padding:46px 0 40px}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+  .foot-brand{max-width:320px}
+  .foot-brand p{color:var(--muted);font-size:14.5px;margin-top:12px}
+  .foot-links{display:flex;gap:54px;flex-wrap:wrap}
+  .foot-col h4{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;font-weight:800}
+  .foot-col a{display:block;color:var(--text);font-size:15px;font-weight:600;margin-bottom:10px;transition:color .15s}
+  .foot-col a:hover{color:#A9B6F5}
+  .foot-bottom{
+    border-top:1px solid var(--line);margin-top:38px;padding-top:24px;
+    display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13.5px;font-weight:600;
+  }
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <img src="assets/icon.png" alt="Swipxl icon">
+      <span>swipxl</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#categories">Categories</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#download" class="nav-cta">Get the app</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="top">
+  <div class="glow" style="width:520px;height:520px;background:#667EEA;top:-160px;left:-120px"></div>
+  <div class="glow" style="width:480px;height:480px;background:#764BA2;top:60px;right:-160px"></div>
+  <div class="wrap hero-grid">
+    <div class="reveal">
+      <span class="eyebrow">Photo cleaner · iOS &amp; Android</span>
+      <h1>Tinder for your <span class="gradient-text">camera roll</span>.</h1>
+      <p class="sub">Swipe left to delete, swipe right to keep. Swipxl scans your library
+        <strong>100% on your device</strong>, sorts the clutter into smart decks, and clears it in
+        minutes — not hours.</p>
+
+      <div class="pill-row">
+        <span class="pill"><span class="dot" style="background:var(--grad-start)"></span> Lightning fast</span>
+        <span class="pill"><span class="dot" style="background:var(--save)"></span> Private by design</span>
+        <span class="pill"><span class="dot" style="background:var(--cat-old)"></span> Fair pricing</span>
+        <span class="pill"><span class="dot" style="background:var(--cat-similar)"></span> Smart detection</span>
+      </div>
+
+      <!-- ============================================================
+           STORE BADGES — replace href="#" with your real store URLs
+           ============================================================ -->
+      <div class="stores" id="download">
+        <!-- TODO: Google Play URL -->
+        <a class="store-badge" href="#" aria-label="Get Swipxl on Google Play" data-store="google-play">
+          <svg width="26" height="28" viewBox="0 0 512 512" aria-hidden="true">
+            <path fill="#34A853" d="M48 34 290 256 48 478c-9 8-24 2-24-12V46c0-14 15-20 24-12z" opacity="0"/>
+            <path fill="#34A853" d="M325 256 70 19c4-2 9-2 14 1l276 159-35 77z"/>
+            <path fill="#FBBC04" d="M325 256l35 77 76 44c20 12 20 41 0 53l-76 44-35-77 35-141z" opacity="0"/>
+            <path fill="#4285F4" d="M59 21C49 15 36 22 36 35v442c0 13 13 20 23 14l262-235L59 21z"/>
+            <path fill="#34A853" d="M321 256 59 21l3-2c5-3 11-3 17 0l268 154-26 83z"/>
+            <path fill="#FBBC04" d="M425 220l-77-44-27 80 27 80 77-44c22-12 22-60 0-72z"/>
+            <path fill="#EA4335" d="M321 256 79 493c-6 3-13 3-18 0l-2-1 262-236z"/>
+          </svg>
+          <span class="st-txt"><span class="st-small">GET IT ON</span><span class="st-big">Google Play</span></span>
+        </a>
+        <!-- TODO: App Store URL -->
+        <a class="store-badge" href="#" aria-label="Download Swipxl on the App Store" data-store="app-store">
+          <svg width="26" height="28" viewBox="0 0 384 512" aria-hidden="true">
+            <path fill="#fff" d="M318 271c-1-58 47-86 49-87-27-39-68-44-83-45-35-4-69 21-86 21-18 0-45-20-74-20-38 1-73 22-93 56-40 69-10 171 28 227 19 27 41 58 70 57 28-1 39-18 73-18 33 0 43 18 73 17 30-1 49-28 67-55 21-31 30-61 30-63-1-1-58-22-58-90zM263 92c15-19 26-44 23-70-22 1-50 15-66 33-14 16-27 42-24 67 25 2 50-13 67-30z"/>
+          </svg>
+          <span class="st-txt"><span class="st-small">Download on the</span><span class="st-big">App Store</span></span>
+        </a>
+      </div>
+      <p class="store-note">Free to start · No account · No ads</p>
+    </div>
+
+    <div class="phone-stage reveal">
+      <div class="phone back">
+        <img src="assets/screenshots/swipe.png" alt="Swipxl swipe deck">
+      </div>
+      <div class="phone">
+        <span class="notch"></span>
+        <img src="assets/screenshots/dashboard.png" alt="Swipxl dashboard with storage ring and category decks">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRUST STRIP ===================== -->
+<section class="trust">
+  <div class="trust-inner">
+    <span class="trust-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+      100% on-device analysis
+    </span>
+    <span class="trust-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      No sign-up required
+    </span>
+    <span class="trust-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      No ads, ever
+    </span>
+    <span class="trust-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z"/><path d="M12 8v4l3 2"/></svg>
+      Recoverable deletes
+    </span>
+  </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Why Swipxl</span>
+      <h2>Built to clean fast — and keep your photos yours.</h2>
+      <p>Four things matter when you clear a camera roll. Swipxl nails all four.</p>
+    </div>
+    <div class="features">
+      <div class="feature reveal">
+        <div class="ic">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <h3>Lightning fast</h3>
+        <p>Review hundreds of photos in minutes with a physics swipe deck and ergonomic tap zones — left to delete, right to keep, center to zoom.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="ic" style="background:rgba(138,255,138,.12);color:var(--save)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3z"/></svg>
+        </div>
+        <h3>Private by design</h3>
+        <p>All analysis happens on your device. Your photos are never uploaded, never collected, and never shared. There's no account and no cloud.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="ic" style="background:rgba(255,240,168,.12);color:var(--cat-old)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2 2.5-2s2.5.8 2.5 2-1.1 1.8-2.5 1.8-2.5.8-2.5 2 1.1 2 2.5 2 2.5-.8 2.5-2"/></svg>
+        </div>
+        <h3>Fair pricing</h3>
+        <p>No predatory subscriptions. Start free, and if you love it, upgrade for about 90% less than the competition — including a one-time Lifetime option.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="ic" style="background:rgba(213,170,255,.12);color:var(--cat-similar)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
+        </div>
+        <h3>Smart detection</h3>
+        <p>On-device heuristics sort your library into 7 clutter categories — so you always know exactly what's safe to clear and what to keep.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section class="sec" id="how" style="padding-top:30px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps to a clean camera roll.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="num">1</div>
+        <h3>Scan</h3>
+        <p>Swipxl scans your photo library entirely on-device, then surfaces the clutter on a dashboard with a storage ring that shows how much space each category is eating.</p>
+      </div>
+      <div class="step reveal">
+        <div class="num">2</div>
+        <h3>Swipe</h3>
+        <p>Open a deck and swipe — left to delete, right to keep, tap the middle to zoom in. Changed your mind? Undo any swipe with a smooth swoop-back.</p>
+      </div>
+      <div class="step reveal">
+        <div class="num">3</div>
+        <h3>Clean</h3>
+        <p>Confirm, and deleted photos move to your device's Trash / Recently Deleted — recoverable for ~30 days. Nothing is gone for good until you say so.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CATEGORIES ===================== -->
+<section class="sec" id="categories" style="padding-top:30px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Smart cleanup</span>
+      <h2>7 categories of clutter, sorted for you.</h2>
+      <p>A photo can belong to more than one category. Duplicates and Screenshots are free — the rest unlock with Pro.</p>
+    </div>
+    <div class="cats">
+      <!-- Duplicates -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(152,232,186,.14);color:var(--cat-duplicate)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/></svg>
+          </span>
+          <span class="tag free">Free</span>
+        </div>
+        <h3>Duplicates</h3>
+        <p>Near-identical copies of the same shot.</p>
+      </div>
+      <!-- Screenshots -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(160,196,255,.14);color:var(--cat-screenshot)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/></svg>
+          </span>
+          <span class="tag free">Free</span>
+        </div>
+        <h3>Screenshots</h3>
+        <p>The ones you saved and forgot.</p>
+      </div>
+      <!-- Blurry -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(255,214,165,.14);color:var(--cat-blurry)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-dasharray="2.5 3.2"/><circle cx="12" cy="12" r="3.5"/></svg>
+          </span>
+          <span class="tag pro">Pro</span>
+        </div>
+        <h3>Blurry</h3>
+        <p>Out-of-focus misfires you'll never use.</p>
+      </div>
+      <!-- Similar -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(213,170,255,.14);color:var(--cat-similar)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 4h11a2 2 0 0 1 2 2v11"/></svg>
+          </span>
+          <span class="tag pro">Pro</span>
+        </div>
+        <h3>Similar / Burst</h3>
+        <p>Pick the best, drop the rest.</p>
+      </div>
+      <!-- Dark -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(176,176,192,.16);color:var(--cat-dark)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+          </span>
+          <span class="tag pro">Pro</span>
+        </div>
+        <h3>Dark</h3>
+        <p>Underexposed or accidental shots.</p>
+      </div>
+      <!-- Memes -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(255,179,179,.14);color:var(--cat-meme)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 4.5-4.5 3 3L16 11l4 4.5"/></svg>
+          </span>
+          <span class="tag pro">Pro</span>
+        </div>
+        <h3>Memes</h3>
+        <p>Downloaded images cluttering your roll.</p>
+      </div>
+      <!-- Old -->
+      <div class="cat reveal">
+        <div class="top">
+          <span class="chip" style="background:rgba(255,240,168,.14);color:var(--cat-old)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+          </span>
+          <span class="tag pro">Pro</span>
+        </div>
+        <h3>Old Photos</h3>
+        <p>Surface what's been sitting for a year+.</p>
+      </div>
+      <!-- All photos -->
+      <div class="cat reveal" style="background:radial-gradient(120% 120% at 0 0,rgba(102,126,234,.18),transparent 60%),var(--card);border-color:rgba(118,75,162,.4)">
+        <div class="top">
+          <span class="chip" style="background:var(--gradient);color:#fff">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg>
+          </span>
+        </div>
+        <h3>Review All Photos</h3>
+        <p>Browse your whole library by month or day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SHOWCASE ===================== -->
+<section class="sec showcase">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Take a look</span>
+      <h2>Premium dark design, all the way through.</h2>
+    </div>
+    <div class="shots">
+      <div class="shot reveal"><img src="assets/screenshots/dashboard.png" alt="Dashboard storage ring"><div class="cap">See your clutter at a glance</div></div>
+      <div class="shot reveal"><img src="assets/screenshots/swipe.png" alt="Swipe deck"><div class="cap">Swipe to delete, swipe to keep</div></div>
+      <div class="shot reveal"><img src="assets/screenshots/complete.png" alt="Deck complete, space saved"><div class="cap">Free up space, instantly</div></div>
+      <div class="shot reveal"><img src="assets/screenshots/fullscreen.png" alt="Fullscreen photo review"><div class="cap">Review every shot up close</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRICING ===================== -->
+<section class="sec" id="pricing">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Pricing</span>
+      <h2>Start free. Upgrade only if you love it.</h2>
+      <p>No predatory subscriptions — including a one-time Lifetime option.</p>
+    </div>
+    <div class="price-grid">
+      <!-- Free -->
+      <div class="plan reveal">
+        <span class="plan-name">Free</span>
+        <div class="lead">$0 <small>/ forever</small></div>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Duplicates &amp; Screenshots decks</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 30 swipes per day</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Storage ring &amp; on-device scan</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Recoverable deletes</li>
+          <li class="off"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg> 5 premium categories</li>
+          <li class="off"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Unlimited swiping</li>
+        </ul>
+        <a href="#download" class="btn-ghost" style="margin-top:auto">Get started free</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan pro reveal">
+        <span class="badge-best">Best value</span>
+        <span class="plan-name gradient-text">Swipxl Pro</span>
+        <div class="lead">Everything, unlocked</div>
+        <div class="tiers">
+          <div class="tier"><div class="t-name">Monthly</div><div class="t-price">$1.99</div><div class="t-sub">per month</div></div>
+          <div class="tier highlight"><div class="t-name">Yearly</div><div class="t-price">$9.99</div><div class="t-sub">per year</div></div>
+          <div class="tier"><div class="t-name">Lifetime</div><div class="t-price">$19.99</div><div class="t-sub">one-time</div></div>
+        </div>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> All 7 cleanup categories</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Unlimited daily swipes</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Full cleanup history &amp; restore</li>
+        </ul>
+        <a href="#download" class="btn-grad" style="margin-top:auto">Get Swipxl</a>
+        <p class="price-note">Prices may vary by region. Subscriptions auto-renew unless cancelled; manage anytime in your app store.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRIVACY BAND ===================== -->
+<section class="sec privacy-band">
+  <div class="wrap">
+    <div class="privacy-card reveal">
+      <div class="shield">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <h2 style="font-size:clamp(26px,3.6vw,36px)">Your photos never leave your device. Ever.</h2>
+      <p style="color:var(--muted);margin-top:16px;max-width:620px;margin-left:auto;margin-right:auto;font-size:17px">
+        Every duplicate, blur, and luminance check runs locally with on-device heuristics. There's no cloud,
+        no account, and no ads. We collect only anonymous, aggregate usage to fix bugs — never your images.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px">
+        <a href="privacy/" class="btn-ghost">Read the Privacy Policy</a>
+        <a href="terms/" class="btn-ghost">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FINAL CTA ===================== -->
+<section class="sec final">
+  <div class="wrap reveal">
+    <span class="eyebrow">Get started</span>
+    <h2>Free up space. Clear the clutter.<br>Keep the memories.</h2>
+    <div class="stores">
+      <!-- TODO: Google Play URL -->
+      <a class="store-badge" href="#" aria-label="Get Swipxl on Google Play" data-store="google-play">
+        <svg width="26" height="28" viewBox="0 0 512 512" aria-hidden="true">
+          <path fill="#4285F4" d="M59 21C49 15 36 22 36 35v442c0 13 13 20 23 14l262-235L59 21z"/>
+          <path fill="#34A853" d="M321 256 59 21l3-2c5-3 11-3 17 0l268 154-26 83z"/>
+          <path fill="#FBBC04" d="M425 220l-77-44-27 80 27 80 77-44c22-12 22-60 0-72z"/>
+          <path fill="#EA4335" d="M321 256 79 493c-6 3-13 3-18 0l-2-1 262-236z"/>
+        </svg>
+        <span class="st-txt"><span class="st-small">GET IT ON</span><span class="st-big">Google Play</span></span>
+      </a>
+      <!-- TODO: App Store URL -->
+      <a class="store-badge" href="#" aria-label="Download Swipxl on the App Store" data-store="app-store">
+        <svg width="26" height="28" viewBox="0 0 384 512" aria-hidden="true">
+          <path fill="#fff" d="M318 271c-1-58 47-86 49-87-27-39-68-44-83-45-35-4-69 21-86 21-18 0-45-20-74-20-38 1-73 22-93 56-40 69-10 171 28 227 19 27 41 58 70 57 28-1 39-18 73-18 33 0 43 18 73 17 30-1 49-28 67-55 21-31 30-61 30-63-1-1-58-22-58-90zM263 92c15-19 26-44 23-70-22 1-50 15-66 33-14 16-27 42-24 67 25 2 50-13 67-30z"/>
+        </svg>
+        <span class="st-txt"><span class="st-small">Download on the</span><span class="st-big">App Store</span></span>
+      </a>
+    </div>
+    <p class="store-note" style="text-align:center">Coming soon to the App Store &amp; Google Play</p>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><img src="assets/icon.png" alt="Swipxl icon" style="width:32px;height:32px;border-radius:9px"><span>swipxl</span></a>
+        <p>Tinder for your camera roll. Swipe left to delete, right to keep — 100% on-device, no predatory subscriptions.</p>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#categories">Categories</a>
+          <a href="#pricing">Pricing</a>
+        </div>
+        <div class="foot-col">
+          <h4>Legal</h4>
+          <a href="privacy/">Privacy Policy</a>
+          <a href="terms/">Terms of Service</a>
+        </div>
+        <div class="foot-col">
+          <h4>Support</h4>
+          <a href="mailto:support@swipxl.app">support@swipxl.app</a>
+          <a href="#download">Download</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Swipxl. All rights reserved.</span>
+      <span>Made for people with too many photos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transitionDelay = (Math.min(i%4,3)*60)+'ms';
+    io.observe(el);
+  });
+</script>
+</body>
+</html>
