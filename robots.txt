@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://swipxl.app/sitemap.xml
+Sitemap: https://swipxlapp.github.io/swipxlweb/sitemap.xml
