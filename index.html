@@ -128,6 +128,8 @@
     padding:11px 18px;min-width:194px;transition:transform .15s, border-color .15s;
   }
   .store-badge:hover{transform:translateY(-2px);border-color:#5a5a72}
+  .store-badge.soon{opacity:.5;cursor:default}
+  .store-badge.soon:hover{transform:none;border-color:#3a3a4a}
   .store-badge svg{flex-shrink:0}
   .store-badge .st-txt{display:flex;flex-direction:column;line-height:1.15;text-align:left}
   .store-badge .st-small{font-size:11px;color:#cfcfe0;font-weight:600;letter-spacing:.3px}
@@ -368,8 +370,7 @@
            STORE BADGES — replace href="#" with your real store URLs
            ============================================================ -->
       <div class="stores" id="download">
-        <!-- TODO: Google Play URL -->
-        <a class="store-badge" href="#" aria-label="Get Swipxl on Google Play" data-store="google-play">
+        <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.swipeclean.swipe_clean" target="_blank" rel="noopener" aria-label="Get Swipxl on Google Play" data-store="google-play">
           <svg width="26" height="28" viewBox="0 0 512 512" aria-hidden="true">
             <path fill="#34A853" d="M48 34 290 256 48 478c-9 8-24 2-24-12V46c0-14 15-20 24-12z" opacity="0"/>
             <path fill="#34A853" d="M325 256 70 19c4-2 9-2 14 1l276 159-35 77z"/>
@@ -381,15 +382,14 @@
           </svg>
           <span class="st-txt"><span class="st-small">GET IT ON</span><span class="st-big">Google Play</span></span>
         </a>
-        <!-- TODO: App Store URL -->
-        <a class="store-badge" href="#" aria-label="Download Swipxl on the App Store" data-store="app-store">
+        <span class="store-badge soon" role="img" aria-label="Swipxl is coming soon to the App Store" data-store="app-store">
           <svg width="26" height="28" viewBox="0 0 384 512" aria-hidden="true">
             <path fill="#fff" d="M318 271c-1-58 47-86 49-87-27-39-68-44-83-45-35-4-69 21-86 21-18 0-45-20-74-20-38 1-73 22-93 56-40 69-10 171 28 227 19 27 41 58 70 57 28-1 39-18 73-18 33 0 43 18 73 17 30-1 49-28 67-55 21-31 30-61 30-63-1-1-58-22-58-90zM263 92c15-19 26-44 23-70-22 1-50 15-66 33-14 16-27 42-24 67 25 2 50-13 67-30z"/>
           </svg>
-          <span class="st-txt"><span class="st-small">Download on the</span><span class="st-big">App Store</span></span>
-        </a>
+          <span class="st-txt"><span class="st-small">COMING SOON</span><span class="st-big">App Store</span></span>
+        </span>
       </div>
-      <p class="store-note">Free to start · No account · No ads</p>
+      <p class="store-note">Now on Google Play · iOS coming soon · Free to start</p>
     </div>
 
     <div class="phone-stage reveal">
@@ -675,8 +675,7 @@
     <span class="eyebrow">Get started</span>
     <h2>Free up space. Clear the clutter.<br>Keep the memories.</h2>
     <div class="stores">
-      <!-- TODO: Google Play URL -->
-      <a class="store-badge" href="#" aria-label="Get Swipxl on Google Play" data-store="google-play">
+      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.swipeclean.swipe_clean" target="_blank" rel="noopener" aria-label="Get Swipxl on Google Play" data-store="google-play">
         <svg width="26" height="28" viewBox="0 0 512 512" aria-hidden="true">
           <path fill="#4285F4" d="M59 21C49 15 36 22 36 35v442c0 13 13 20 23 14l262-235L59 21z"/>
           <path fill="#34A853" d="M321 256 59 21l3-2c5-3 11-3 17 0l268 154-26 83z"/>
@@ -685,15 +684,14 @@
         </svg>
         <span class="st-txt"><span class="st-small">GET IT ON</span><span class="st-big">Google Play</span></span>
       </a>
-      <!-- TODO: App Store URL -->
-      <a class="store-badge" href="#" aria-label="Download Swipxl on the App Store" data-store="app-store">
+      <span class="store-badge soon" role="img" aria-label="Swipxl is coming soon to the App Store" data-store="app-store">
         <svg width="26" height="28" viewBox="0 0 384 512" aria-hidden="true">
           <path fill="#fff" d="M318 271c-1-58 47-86 49-87-27-39-68-44-83-45-35-4-69 21-86 21-18 0-45-20-74-20-38 1-73 22-93 56-40 69-10 171 28 227 19 27 41 58 70 57 28-1 39-18 73-18 33 0 43 18 73 17 30-1 49-28 67-55 21-31 30-61 30-63-1-1-58-22-58-90zM263 92c15-19 26-44 23-70-22 1-50 15-66 33-14 16-27 42-24 67 25 2 50-13 67-30z"/>
         </svg>
-        <span class="st-txt"><span class="st-small">Download on the</span><span class="st-big">App Store</span></span>
-      </a>
+        <span class="st-txt"><span class="st-small">COMING SOON</span><span class="st-big">App Store</span></span>
+      </span>
     </div>
-    <p class="store-note" style="text-align:center">Coming soon to the App Store &amp; Google Play</p>
+    <p class="store-note" style="text-align:center">Now on Google Play · iOS coming soon</p>
   </div>
 </section>
 
