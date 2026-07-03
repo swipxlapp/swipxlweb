@@ -22,16 +22,20 @@ The privacy & terms pages live in their own folders so the URLs resolve as
 (directory requests serve `index.html` by default). These exact paths are hard-coded
 in the app, so **don't rename these folders.**
 
+## Store badges
+
+- **Google Play** is live: both badges (hero + final CTA) use Google's official
+  `assets/google-play-badge.svg`, linked to
+  `https://play.google.com/store/apps/details?id=com.swipeclean.swipe_clean`.
+- **App Store** is a dimmed "Coming soon" pill (class `.as-badge.soon`) styled to match the
+  Google badge. When iOS ships, turn each `.as-badge` `<span>` into an `<a href="...">` pointing
+  at `https://apps.apple.com/app/id<your-app-id>` and drop the `soon` class.
+
 ## Before going live
 
-1. **Add the store links.** In `index.html`, search for `data-store=` — there are two badge
-   sets (hero + final CTA). Replace each `href="#"` with the real URL:
-   - Google Play: `https://play.google.com/store/apps/details?id=<your.package.id>`
-   - App Store: `https://apps.apple.com/app/id<your-app-id>`
-   Each placeholder is marked with a `<!-- TODO -->` comment.
-2. **Set the domain.** Update the `og:url` in `index.html` and the URLs in `sitemap.xml`
-   if you use a domain other than `swipxl.app`.
-3. **Fill the Terms governing-law placeholder** (`terms/index.html`, Section 12).
+1. **Set the domain.** Update `og:url` in `index.html` and the URLs in `sitemap.xml`/`robots.txt`
+   if you move off the current GitHub Pages URL.
+2. **Fill the Terms governing-law placeholder** (`terms/index.html`, Section 12).
 
 ## Deploying
 
